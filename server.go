@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // Elements of Todo app
@@ -32,10 +33,30 @@ func getTasks(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, todoTasks)
 }
 
+func addTasks(context *gin.Context) {
+	var newTask todoElements
+	//Binding json data
+	if err := context.BindJSON(&newTask); err != nil {
+		return
+	}
+	// Adding tasks to the slice
+	for _, task := range todoTasks {
+		taskId, err := strconv.Atoi(context.Param("Id"))
+		handleError(err)
+		if taskId == task.Id {
+			context.IndentedJSON(http.StatusNotFound, "Tasks already exists, please change the ID of tasks")
+		} else {
+			todoTasks = append(todoTasks, newTask)
+			context.IndentedJSON(http.StatusCreated, todoTasks)
+		}
+	}
+}
+
 func main() {
 	// Run the server
 	server := gin.Default()
-	server.GET("/todo-tasks", getTasks)
+	server.GET("/tasks", getTasks)
+	server.POST("/add-task", addTasks)
 
 	err := server.Run("localhost:5050")
 	handleError(err)
