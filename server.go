@@ -28,15 +28,16 @@ func handleError(err error) {
 
 // Get The tasks
 func getTasks(context *gin.Context) {
-	//Json conversion
+	//Json conversion and return the tasks
 	context.IndentedJSON(http.StatusOK, todoTasks)
 }
 
 func main() {
 	// Run the server
 	server := gin.Default()
+	server.GET("/todo-tasks", getTasks)
+
 	err := server.Run("localhost:5050")
 	handleError(err)
 
-	server.GET("/todoTasks")
 }
