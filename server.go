@@ -71,12 +71,23 @@ func getTask(context *gin.Context) {
 
 }
 
+func updateTask(context *gin.Context) {
+	taskId, _ := strconv.Atoi(context.Param("id")) // That convert string id to the int
+	task, err := getSingleTask(taskId)
+	if err != nil {
+		context.IndentedJSON(http.StatusNotFound, gin.H{"message": "Task doesn't exits"})
+	}
+	task.isCompleted = !task.isCompleted
+	context.IndentedJSON(http.StatusOK, task)
+}
+
 func main() {
 	// Run the server
 	server := gin.Default()
 	server.GET("/tasks", getTasks)
 	server.POST("/add-task", addTasks)
 	server.GET("/tasks/:id", getTask)
+	server.PUT("tasks/:id", updateTask)
 
 	err := server.Run("localhost:5050")
 	handleError(err)
